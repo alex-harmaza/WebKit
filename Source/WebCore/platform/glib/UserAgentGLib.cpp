@@ -48,69 +48,17 @@ namespace WebCore {
 
 static const char* platformForUAString()
 {
-#if OS(MAC_OS_X)
-    return "Macintosh";
-#else
-    if (chassisType() == WTF::ChassisType::Mobile)
-        return "Linux";
-    return "X11";
-#endif
+    return "iPhone";
 }
 
 static const String platformVersionForUAString()
 {
-#if OS(UNIX)
-    if (chassisType() == WTF::ChassisType::Mobile)
-        return "like Android 4.4";
-
-    struct utsname name;
-    uname(&name);
-    static NeverDestroyed<const String> uaOSVersion(makeString(name.sysname, ' ', name.machine));
-    return uaOSVersion;
-#else
-    // We will always claim to be Safari in Intel Mac OS X, since Safari without
-    // OS X or anything on ARM triggers mobile versions of some websites.
-    static NeverDestroyed<const String> uaOSVersion(MAKE_STATIC_STRING_IMPL("Intel Mac OS X 10_13_4"));
-    return uaOSVersion;
-#endif
+    return "CPU iPhone OS 15_0_2 like Mac OS X";
 }
 
 static String buildUserAgentString(const UserAgentQuirks& quirks)
 {
-    StringBuilder uaString;
-    uaString.append("Mozilla/5.0 (");
-
-    if (quirks.contains(UserAgentQuirks::NeedsMacintoshPlatform))
-        uaString.append(UserAgentQuirks::stringForQuirk(UserAgentQuirks::NeedsMacintoshPlatform));
-    else {
-        uaString.append(platformForUAString(), "; ");
-#if defined(USER_AGENT_BRANDING)
-        uaString.append(USER_AGENT_BRANDING "; ");
-#endif
-        uaString.append(platformVersionForUAString());
-    }
-
-    if (quirks.contains(UserAgentQuirks::NeedsFirefoxBrowser)) {
-        uaString.append(UserAgentQuirks::stringForQuirk(UserAgentQuirks::NeedsFirefoxBrowser));
-        return uaString.toString();
-    }
-
-    uaString.append(") AppleWebKit/605.1.15 (KHTML, like Gecko) ");
-
-    // Note that Chrome UAs advertise *both* Chrome/X and Safari/X, but it does
-    // not advertise Version/X.
-    if (quirks.contains(UserAgentQuirks::NeedsChromeBrowser)) {
-        uaString.append(UserAgentQuirks::stringForQuirk(UserAgentQuirks::NeedsChromeBrowser), ' ');
-    // Version/X is mandatory *before* Safari/X to be a valid Safari UA. See
-    // https://bugs.webkit.org/show_bug.cgi?id=133403 for details.
-    } else
-        uaString.append("Version/15.0 ");
-
-    if (chassisType() == WTF::ChassisType::Mobile)
-        uaString.append("Mobile ");
-    uaString.append("Safari/605.1.15");
-
-    return uaString.toString();
+    return "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1";
 }
 
 static const String standardUserAgentStatic()
